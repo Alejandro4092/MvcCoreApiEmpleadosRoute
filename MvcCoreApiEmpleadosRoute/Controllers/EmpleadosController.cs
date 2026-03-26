@@ -23,13 +23,25 @@ namespace MvcCoreApiEmpleadosRoute.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Index(string oficio)
+        [Route("Empleados/FiltrarPorOficio")]
+        public async Task<IActionResult> FiltrarPorOficio(string oficio)
         {
             List<string> oficios = await this.service.GetOficiosAsync();
             List<Empleado> empleados = await this.service.GetEmpleadosOficioAsync(oficio);
             ViewData["OFICIOS"] = oficios;
 
-            return View(empleados);
+            return View("Index", empleados);
+        }
+
+        [HttpPost]
+        [Route("Empleados/FiltrarPorOficio2")]
+        public async Task<IActionResult> FiltrarPorOficio2(string oficio)
+        {
+            List<string> oficios = await this.service.GetOficiosAsync();
+            List<Empleado> empleados = await this.service.GetEmpleadosOficioAsync(oficio);
+            ViewData["OFICIOS"] = oficios;
+
+            return View("Index", empleados);
         }
     }
 }

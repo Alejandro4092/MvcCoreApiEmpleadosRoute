@@ -1,5 +1,5 @@
-﻿using NugetApiModels.Models;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
+using NugetApiModels.Models;
 
 namespace MvcCoreApiEmpleadosRoute.Services
 {
@@ -14,57 +14,45 @@ namespace MvcCoreApiEmpleadosRoute.Services
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
         }
 
-        public async Task<List<Empleado>> GetEmpleadosAsync()
+        public async Task<T> CallApiAsync<T>(string request)
         {
             using (HttpClient client = new HttpClient())
             {
-                string request = "api/empleados";
-
                 client.BaseAddress = new Uri(this.ApiUrl);
-                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
-
                 HttpResponseMessage response = await client.GetAsync(request);
-
                 if (response.IsSuccessStatusCode)
                 {
-                    List<Empleado> empleados = await response.Content.ReadAsAsync<List<Empleado>>();
-
-                    return empleados;
+                    T data = await response.Content.ReadAsAsync<T>();
+                    return data;
                 }
                 else
                 {
-                    return null;
+                    return default(T);
                 }
             }
         }
 
-        public async Task<List<string>> GetOficiosAsync()
+        public async Task<List<Empleado>> GetEmpleadosAsync()
         {
-            using (HttpClient client = new HttpClient())
-            {
-                string request = "api/empleados/oficios";
-                client.BaseAddress = new Uri(this.ApiUrl);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(this.header);
-                HttpResponseMessage response = await client.GetAsync(request);
-                if (response.IsSuccessStatusCode)
-                {
-                    List<string> oficios = await response.Content.ReadAsAsync<List<string>>();
-                    return oficios;
-                }
-                else
-                {
-                    return null;
-                }
-            }
+            string request = "api/empleados";
+            List<Empleado> empleados = await this.CallApiAsync<List<Empleado>>(request);
+            return empleados;
+        }
+
+        public async Task<List<string>> GetOficiosAsync(string oficio)
+        {
+            string request = "api/empleados/oficios";
+            List<string> oficios = await this.CallApiAsync<List<string>>(request);
+            return oficios;
         }
 
         public async Task<List<Empleado>> GetEmpleadosOficioAsync(string oficio)
         {
             using (HttpClient client = new HttpClient())
             {
-                string request = "/api/empleados/empleadosbyoficio/" + oficio;
+                string request = "/api/Empleados/EmpleadosPorOficio/" + oficio;
                 client.BaseAddress = new Uri(this.ApiUrl);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(this.header);
@@ -79,6 +67,13 @@ namespace MvcCoreApiEmpleadosRoute.Services
                     return null;
                 }
             }
+        }
+
+        public async Task<Empleado> FindEmpleadoAsync(int idEmpleado)
+        {
+            string request = "/api/empleados/" + idEmpleado;
+            Empleado empleado = await this.CallApiAsync<Empleado>(request);
+            return empleado;
         }
     }
 }
